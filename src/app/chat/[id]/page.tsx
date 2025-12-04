@@ -19,7 +19,10 @@ import {
   PromptInputTextarea,
 } from "@/components/ai-elements/prompt-input";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { AgentsetUIMessage } from "@agentset/ai-sdk";
 import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import type { IngestJobSchema } from "agentset";
 import {
   AlertCircleIcon,
@@ -27,6 +30,7 @@ import {
   Loader2Icon,
   MessageSquareIcon,
   RefreshCwIcon,
+  SearchIcon,
 } from "lucide-react";
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
@@ -269,9 +273,21 @@ function CancelledState({ fileName }: { fileName: string }) {
   );
 }
 
+// Status display labels for RAG workflow
+const STATUS_LABELS: Record<string, string> = {
+  "generating-queries": "Generating search queries...",
+  "evaluating-queries": "Searching document...",
+  searching: "Searching document...",
+  answering: "Generating answer...",
+};
+
 function ChatInterface({ fileName }: { fileName: string }) {
   const [input, setInput] = useState("");
-  const { messages, sendMessage, status } = useChat({});
+  const { messages, sendMessage, status } = useChat<AgentsetUIMessage>({
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+    }),
+  });
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -279,6 +295,33 @@ function ChatInterface({ fileName }: { fileName: string }) {
       sendMessage({ text: input });
       setInput("");
     }
+  }
+
+  // Get current RAG status from the last assistant message
+  function getCurrentStatus(message: AgentsetUIMessage): string | null {
+    if (message.role !== "assistant") return null;
+
+    for (const part of message.parts) {
+      if (part.type === "data-status") {
+        return part.data as string;
+      }
+    }
+    return null;
+  }
+
+  // Get text content from message parts
+  function getTextContent(message: AgentsetUIMessage): string {
+    return message.parts
+      .filter(part => part.type === "text")
+      .map(part => (part.type === "text" ? part.text : ""))
+      .join("");
+  }
+
+  // Check if message has any text content
+  function hasTextContent(message: AgentsetUIMessage): boolean {
+    return message.parts.some(
+      part => part.type === "text" && part.text.trim().length > 0
+    );
   }
 
   return (
@@ -308,26 +351,37 @@ function ChatInterface({ fileName }: { fileName: string }) {
               icon={<MessageSquareIcon className="size-8" />}
             />
           ) : (
-            messages.map(message => (
-              <Message key={message.id} from={message.role}>
-                <MessageContent>
-                  {message.role === "user" ? (
-                    message.parts.map((part, index) =>
-                      part.type === "text" ? (
-                        <span key={index}>{part.text}</span>
-                      ) : null
-                    )
-                  ) : (
-                    <MessageResponse>
-                      {message.parts
-                        .filter(part => part.type === "text")
-                        .map(part => (part.type === "text" ? part.text : ""))
-                        .join("")}
-                    </MessageResponse>
-                  )}
-                </MessageContent>
-              </Message>
-            ))
+            messages.map(message => {
+              const ragStatus = getCurrentStatus(message);
+              const textContent = getTextContent(message);
+              const hasText = hasTextContent(message);
+
+              return (
+                <Message key={message.id} from={message.role}>
+                  <MessageContent>
+                    {message.role === "user" ? (
+                      message.parts.map((part, index) =>
+                        part.type === "text" ? (
+                          <span key={index}>{part.text}</span>
+                        ) : null
+                      )
+                    ) : (
+                      <div className="space-y-3">
+                        {/* Show RAG status indicator */}
+                        {ragStatus && !hasText && (
+                          <RAGStatusIndicator status={ragStatus} />
+                        )}
+
+                        {/* Show the response text */}
+                        {hasText && (
+                          <MessageResponse>{textContent}</MessageResponse>
+                        )}
+                      </div>
+                    )}
+                  </MessageContent>
+                </Message>
+              );
+            })
           )}
         </ConversationContent>
         <ConversationScrollButton />
@@ -355,6 +409,22 @@ function ChatInterface({ fileName }: { fileName: string }) {
           </PromptInput>
         </div>
       </footer>
+    </div>
+  );
+}
+
+function RAGStatusIndicator({ status }: { status: string }) {
+  const label = STATUS_LABELS[status] || "Processing...";
+
+  return (
+    <div
+      className={cn(
+        "flex items-center gap-2 text-sm text-muted-foreground",
+        "animate-pulse"
+      )}
+    >
+      <SearchIcon className="size-4" />
+      <span>{label}</span>
     </div>
   );
 }
