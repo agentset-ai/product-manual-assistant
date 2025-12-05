@@ -2,10 +2,15 @@
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { FileTextIcon, Loader2Icon, UploadCloudIcon, XIcon } from "lucide-react";
+import {
+  FileTextIcon,
+  Loader2Icon,
+  UploadCloudIcon,
+  XIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
-import { createIngestion } from "./actions";
+import { createIngestion, createUploadPresignedUrl } from "./actions";
 
 const MAX_FILE_SIZE = 200 * 1024 * 1024; // 200MB
 
@@ -80,22 +85,13 @@ export default function Home() {
 
     try {
       // Step 1: Get presigned URL
-      const presignedResponse = await fetch("/api/upload", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          fileName: file.name,
-          contentType: file.type,
-          fileSize: file.size,
-        }),
+      const presignedResponse = await createUploadPresignedUrl({
+        fileName: file.name,
+        contentType: file.type,
+        fileSize: file.size,
       });
 
-      if (!presignedResponse.ok) {
-        const errorData = await presignedResponse.json();
-        throw new Error(errorData.error || "Failed to get upload URL");
-      }
-
-      const { url, key } = await presignedResponse.json();
+      const { url, key } = presignedResponse;
 
       // Step 2: Upload file to presigned URL
       const uploadResponse = await fetch(url, {
@@ -114,7 +110,8 @@ export default function Home() {
       const job = await createIngestion(key, file.name);
 
       // Step 4: Redirect to chat page
-      router.push(`/chat/${job.id}`);
+      const jobIdWithoutPrefix = job.id.split("_").at(1);
+      router.push(`/chat/${jobIdWithoutPrefix}`);
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "An error occurred");

@@ -59,7 +59,8 @@ export default function ChatPage({ params }: PageProps) {
 
   const fetchJobStatus = useCallback(async () => {
     try {
-      const jobData = await getIngestionJob(jobId);
+      const jobIdWithPrefix = `job_${jobId}`;
+      const jobData = await getIngestionJob(jobIdWithPrefix);
       setJob(jobData);
       setError(null);
       return jobData;
@@ -129,7 +130,8 @@ export default function ChatPage({ params }: PageProps) {
   }
 
   if (job.status === "COMPLETED") {
-    return <ChatInterface fileName={fileName} />;
+    // Use externalId (chatId) for filtering searches to this specific document
+    return <ChatInterface fileName={fileName} chatId={job.externalId} />;
   }
 
   // Fallback for unexpected statuses
@@ -281,11 +283,18 @@ const STATUS_LABELS: Record<string, string> = {
   answering: "Generating answer...",
 };
 
-function ChatInterface({ fileName }: { fileName: string }) {
+function ChatInterface({
+  fileName,
+  chatId,
+}: {
+  fileName: string;
+  chatId: string | null;
+}) {
   const [input, setInput] = useState("");
   const { messages, sendMessage, status } = useChat<AgentsetUIMessage>({
     transport: new DefaultChatTransport({
       api: "/api/chat",
+      body: { chatId },
     }),
   });
 

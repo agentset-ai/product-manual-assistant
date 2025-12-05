@@ -1,6 +1,7 @@
 import { AgenticEngine } from "@agentset/ai-sdk";
 import { getNamespace } from "@/lib/agentset";
 import { llmModel } from "@/lib/llm";
+import { z } from "zod";
 import {
   convertToModelMessages,
   createUIMessageStreamResponse,
@@ -16,16 +17,21 @@ Guidelines:
 - Format responses with markdown when appropriate (lists, code blocks, etc.)
 - Keep responses focused and relevant to the user's question about the product`;
 
-export async function POST(req: Request) {
-  const { messages } = await req.json();
+const chatBodySchema = z.object({
+  messages: z.array(z.any()),
+  chatId: z.string().min(1, "Chat ID is required"),
+});
 
-  // Validate incoming messages
+export async function POST(req: Request) {
+  const { messages, chatId } = chatBodySchema.parse(await req.json());
   const validatedMessages = await validateUIMessages({ messages });
+
   const modelMessages = convertToModelMessages(validatedMessages);
 
   const ns = getNamespace();
 
   // Use AgenticEngine for RAG-powered responses
+  // Filter search to only include documents from this specific chat/ingestion
   const stream = AgenticEngine(ns, {
     messages: modelMessages,
     generateQueriesStep: {
@@ -37,6 +43,9 @@ export async function POST(req: Request) {
     answerStep: {
       model: llmModel,
       system: SYSTEM_PROMPT,
+    },
+    queryOptions: {
+      filter: { chatId },
     },
   });
 
