@@ -1,6 +1,5 @@
 "use client";
 
-import { getIngestionJob } from "@/app/actions";
 import { useQuery } from "@tanstack/react-query";
 import type { IngestJobSchema } from "agentset";
 import { ChatInterface } from "./chat-interface";
@@ -38,7 +37,16 @@ export function ChatPageClient({ jobId }: ChatPageClientProps) {
     refetch,
   } = useQuery({
     queryKey: ["ingestionJob", jobIdWithPrefix],
-    queryFn: () => getIngestionJob(jobIdWithPrefix),
+    queryFn: async () => {
+      const url = new URL("/api/get-ingestion-job");
+      url.searchParams.set("jobId", jobIdWithPrefix);
+
+      const response = await fetch(url.toString());
+      if (!response.ok) {
+        throw new Error(`Failed to fetch job status: ${response.statusText}`);
+      }
+      return response.json();
+    },
     refetchInterval: query => {
       // Only poll while the job is in a processing state
       const currentJob = query.state.data;

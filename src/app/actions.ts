@@ -45,12 +45,6 @@ export async function createIngestion(key: string, fileName: string) {
   return job;
 }
 
-export async function getIngestionJob(jobId: string) {
-  const ns = getNamespace();
-  const job = await ns.ingestion.get(jobId);
-  return job;
-}
-
 const createUploadPresignedUrlBodySchema = z.object({
   fileName: z.string().min(1, "File name is required"),
   contentType: z
