@@ -34,6 +34,12 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { use, useCallback, useEffect, useState } from "react";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Chat with Product Manual",
+  description: "Chat with your product manual using AI. Powered by Agentset.",
+};
 
 type JobStatus = IngestJobSchema["status"];
 
