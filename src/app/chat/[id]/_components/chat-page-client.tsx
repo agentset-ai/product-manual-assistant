@@ -38,10 +38,13 @@ export function ChatPageClient({ jobId }: ChatPageClientProps) {
   } = useQuery({
     queryKey: ["ingestionJob", jobIdWithPrefix],
     queryFn: async () => {
-      const url = new URL("/api/get-ingestion-job");
-      url.searchParams.set("jobId", jobIdWithPrefix);
+      const urlSearchParams = new URLSearchParams();
+      urlSearchParams.set("jobId", jobIdWithPrefix);
 
-      const response = await fetch(url.toString());
+      const response = await fetch(
+        `/api/get-ingestion-job?${urlSearchParams.toString()}`
+      );
+
       if (!response.ok) {
         throw new Error(`Failed to fetch job status: ${response.statusText}`);
       }
