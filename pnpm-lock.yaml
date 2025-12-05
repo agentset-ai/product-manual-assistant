@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@agentset/ai-sdk':
         specifier: ^2.1.2
-        version: 2.1.2(agentset@1.7.0)(ai@5.0.106(zod@4.1.13))(zod@4.1.13)
+        version: 2.1.2(agentset@1.8.0)(ai@5.0.106(zod@4.1.13))(zod@4.1.13)
       '@ai-sdk/openai':
         specifier: ^2.0.76
         version: 2.0.76(zod@4.1.13)
@@ -54,8 +54,8 @@ importers:
         specifier: ^12.10.0
         version: 12.10.0(@types/react@19.2.7)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       agentset:
-        specifier: ^1.7.0
-        version: 1.7.0
+        specifier: ^1.8.0
+        version: 1.8.0
       ai:
         specifier: ^5.0.106
         version: 5.0.106(zod@4.1.13)
@@ -1468,8 +1468,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  agentset@1.7.0:
-    resolution: {integrity: sha512-1P/iHqVxvvguKdod5YiHEq4apRVgrG6fcoVqib8C9OpSTaepoIYAqNnuribYqgEGMJ6nf0p6zq6Vn/rBudr+EQ==}
+  agentset@1.8.0:
+    resolution: {integrity: sha512-G7LXR7zW1gQ+W3JP9ojd/yCq/n7w4RSPmHtgTgzPgPhBD+fpQjxNiX73NmaopEXaqskZyyXC6DM6sPxMF7UFOA==}
 
   ai@5.0.106:
     resolution: {integrity: sha512-M5obwavxSJJ3tGlAFqI6eltYNJB0D20X6gIBCFx/KVorb/X1fxVVfiZZpZb+Gslu4340droSOjT0aKQFCarNVg==}
@@ -3615,9 +3615,9 @@ packages:
 
 snapshots:
 
-  '@agentset/ai-sdk@2.1.2(agentset@1.7.0)(ai@5.0.106(zod@4.1.13))(zod@4.1.13)':
+  '@agentset/ai-sdk@2.1.2(agentset@1.8.0)(ai@5.0.106(zod@4.1.13))(zod@4.1.13)':
     dependencies:
-      agentset: 1.7.0
+      agentset: 1.8.0
       ai: 5.0.106(zod@4.1.13)
       zod: 4.1.13
 
@@ -4949,7 +4949,7 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  agentset@1.7.0: {}
+  agentset@1.8.0: {}
 
   ai@5.0.106(zod@4.1.13):
     dependencies:

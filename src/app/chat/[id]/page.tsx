@@ -336,18 +336,23 @@ function ChatInterface({
   return (
     <div className="flex min-h-screen flex-col bg-background">
       <header className="border-b border-border px-6 py-4">
-        <div className="mx-auto max-w-3xl flex items-center gap-3">
-          <div className="rounded-lg bg-primary/10 p-2">
-            <FileTextIcon className="size-5 text-primary" />
+        <div className="mx-auto max-w-3xl flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="rounded-lg bg-primary/10 p-2">
+              <FileTextIcon className="size-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-semibold text-foreground truncate">
+                {fileName}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Product Manual Assistant
+              </p>
+            </div>
           </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-lg font-semibold text-foreground truncate">
-              {fileName}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Product Manual Assistant
-            </p>
-          </div>
+          <Button variant="outline" asChild className="whitespace-nowrap">
+            <Link href="/">New Chat</Link>
+          </Button>
         </div>
       </header>
 

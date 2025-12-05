@@ -36,6 +36,8 @@ export async function createIngestion(key: string, fileName: string) {
       fileName,
     },
     config: {
+      chunkSize: 1024,
+      strategy: "auto",
       metadata: { chatId },
     },
   });

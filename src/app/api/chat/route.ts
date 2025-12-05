@@ -45,6 +45,8 @@ export async function POST(req: Request) {
       system: SYSTEM_PROMPT,
     },
     queryOptions: {
+      rerankLimit: 5,
+      minScore: 0.5,
       filter: { chatId },
     },
   });
