@@ -6,6 +6,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -43,6 +44,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      <SidebarProvider>{children}</SidebarProvider>
+    </QueryClientProvider>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useChatHistory } from "@/hooks/use-chat-history";
 import { cn } from "@/lib/utils";
 import {
   FileTextIcon,
@@ -18,6 +19,7 @@ type UploadStatus = "idle" | "uploading" | "processing" | "error";
 
 export default function Home() {
   const router = useRouter();
+  const { addChat } = useChatHistory();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<UploadStatus>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -109,14 +111,17 @@ export default function Home() {
       // Step 3: Create ingestion job
       const job = await createIngestion(key, file.name);
 
-      // Step 4: Redirect to chat page
-      const jobIdWithoutPrefix = job.id.split("_").at(1);
+      // Step 4: Save chat to history
+      const jobIdWithoutPrefix = job.id.split("_").at(1)!;
+      addChat({ id: jobIdWithoutPrefix, fileName: file.name });
+
+      // Step 5: Redirect to chat page
       router.push(`/chat/${jobIdWithoutPrefix}`);
     } catch (err) {
       setStatus("error");
       setError(err instanceof Error ? err.message : "An error occurred");
     }
-  }, [file, router]);
+  }, [file, router, addChat]);
 
   const handleRemoveFile = useCallback(() => {
     setFile(null);
@@ -131,7 +136,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background p-8">
+    <div className="flex h-full flex-col items-center justify-center bg-background p-8">
       <div className="w-full max-w-xl space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-bold text-foreground">

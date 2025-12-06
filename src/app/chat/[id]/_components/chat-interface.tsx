@@ -101,8 +101,8 @@ export function ChatInterface({
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <header className="border-b border-border px-6 py-4">
+    <div className="flex h-screen flex-col overflow-hidden bg-background">
+      <header className="shrink-0 border-b border-border px-6 py-4">
         <div className="mx-auto max-w-3xl flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 flex-1 min-w-0">
             <div className="rounded-lg bg-primary/10 p-2">
@@ -123,7 +123,7 @@ export function ChatInterface({
         </div>
       </header>
 
-      <Conversation className="flex-1">
+      <Conversation className="min-h-0 flex-1">
         <ConversationContent className="mx-auto max-w-3xl px-4 py-6">
           {messages.length === 0 ? (
             <ConversationEmptyState
@@ -168,7 +168,7 @@ export function ChatInterface({
         <ConversationScrollButton />
       </Conversation>
 
-      <footer className="border-t border-border bg-background p-4">
+      <footer className="shrink-0 border-t border-border bg-background p-4">
         <div className="mx-auto max-w-3xl">
           <PromptInput
             onSubmit={(msg, e) => {
