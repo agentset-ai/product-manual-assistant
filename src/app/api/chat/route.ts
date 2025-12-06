@@ -34,6 +34,7 @@ export async function POST(req: Request) {
   // Filter search to only include documents from this specific chat/ingestion
   const stream = AgenticEngine(ns, {
     messages: modelMessages,
+    maxEvals: 1,
     generateQueriesStep: {
       model: llmModel,
     },
